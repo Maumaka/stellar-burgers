@@ -1,11 +1,21 @@
 import { FC } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ProfileMenuUI } from '@ui';
+import { useDispatch } from '../../services/store';
+import { logoutUserThunk } from '@slices';
 
 export const ProfileMenu: FC = () => {
-  const { pathname } = useLocation();
+  // текущий путь маршрута
+  const loc = useLocation();
+  const currentPath = loc.pathname;
 
-  const handleLogout = () => {};
+  // диспатч для вызова thunk-ов
+  const appDispatch = useDispatch();
 
-  return <ProfileMenuUI handleLogout={handleLogout} pathname={pathname} />;
+  // обработчик выхода: запускаем thunk выхода
+  const onLogout = () => {
+    appDispatch(logoutUserThunk());
+  };
+
+  return <ProfileMenuUI handleLogout={onLogout} pathname={currentPath} />;
 };

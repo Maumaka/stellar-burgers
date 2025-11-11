@@ -1,45 +1,87 @@
 import { FC, useMemo } from 'react';
 import { TConstructorIngredient } from '@utils-types';
 import { BurgerConstructorUI } from '@ui';
+import { useNavigate } from 'react-router-dom';
+import store, { useDispatch, useSelector } from '../../services/store';
+import {
+  clearOrderModalData,
+  constructorDataSelector as selectConstructorData,
+  createBurgerThunk,
+  isAuthSelector as selectIsAuth,
+  orderModalDataSelector as selectOrderModalData,
+  orderRequestSelector as selectOrderRequest,
+  setOrderRequest
+} from '@slices';
 
 export const BurgerConstructor: FC = () => {
-  /** TODO: взять переменные constructorItems, orderRequest и orderModalData из стора */
-  const constructorItems = {
-    bun: {
-      price: 0
-    },
-    ingredients: []
-  };
+  // навигатор для переходов между страницами
+  const routerNavigate = useNavigate();
 
-  const orderRequest = false;
+  // диспатч для отправки действий в стор
+  const appDispatch = useDispatch();
 
-  const orderModalData = null;
+  // флаг, указывающий, авторизован ли пользователь
+  const userIsAuthenticated = useSelector(selectIsAuth);
 
+  // данные конструктора (булка + ингредиенты)
+  const constructorState = useSelector(selectConstructorData);
+
+  // флаг, что запрос на создание заказа в процессе
+  const isOrderPending = useSelector(selectOrderRequest);
+
+  // данные для модального окна заказа
+  const orderModalState = useSelector(selectOrderModalData);
+
+  // обработчик нажатия на кнопку "оформить заказ"
   const onOrderClick = () => {
-    if (!constructorItems.bun || orderRequest) return;
-  };
-  const closeOrderModal = () => {};
+    // если пользователь не авторизован — отправляем на страницу логина
+    if (!userIsAuthenticated) {
+      routerNavigate('/login');
+      return;
+    }
 
+    // если нет булки или уже идёт запрос — ничего не делаем
+    if (!constructorState.bun || isOrderPending) return;
+
+    // собираем массив id ингредиентов (начало и конец — булка)
+    const order = [
+      constructorState.bun?._id,
+      ...constructorState.ingredients.map((ingredient) => ingredient._id),
+      constructorState.bun?._id
+    ].filter(Boolean);
+
+    // отправляем thunk для создания бургера
+    appDispatch(createBurgerThunk(order));
+  };
+
+  // закрыть модалку заказа и сбросить данные
+  const closeOrderModal = () => {
+    appDispatch(setOrderRequest(false));
+    appDispatch(clearOrderModalData());
+  };
+
+  // вычисляем итоговую стоимость бургера
   const price = useMemo(
     () =>
-      (constructorItems.bun ? constructorItems.bun.price * 2 : 0) +
-      constructorItems.ingredients.reduce(
-        (s: number, v: TConstructorIngredient) => s + v.price,
+      (constructorState.bun ? constructorState.bun.price * 2 : 0) +
+      constructorState.ingredients.reduce(
+        (sum: number, item: TConstructorIngredient) => sum + item.price,
         0
       ),
-    [constructorItems]
+    [constructorState]
   );
 
-  return null;
-
+  // рендерим презентационную часть конструктора
   return (
     <BurgerConstructorUI
       price={price}
-      orderRequest={orderRequest}
-      constructorItems={constructorItems}
-      orderModalData={orderModalData}
+      orderRequest={isOrderPending}
+      constructorItems={constructorState}
+      orderModalData={orderModalState}
       onOrderClick={onOrderClick}
       closeOrderModal={closeOrderModal}
     />
   );
 };
+
+//

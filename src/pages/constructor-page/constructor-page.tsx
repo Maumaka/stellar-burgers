@@ -1,15 +1,19 @@
+import { FC } from 'react';
 import { useSelector } from '../../services/store';
 
 import styles from './constructor-page.module.css';
 
-import { BurgerIngredients } from '../../components';
-import { BurgerConstructor } from '../../components';
+import { BurgerIngredients, BurgerConstructor } from '../../components';
 import { Preloader } from '../../components/ui';
-import { FC } from 'react';
+import { ingredientsStateSelector } from '@slices';
 
 export const ConstructorPage: FC = () => {
-  /** TODO: взять переменную из стора */
-  const isIngredientsLoading = false;
+  // получаем состояние ингредиентов (поддерживаем старую и новую форму)
+  const ingredientsState = useSelector(ingredientsStateSelector) as any;
+  const isIngredientsLoading = Boolean(
+    // совместимость: если в слайсе поле называется loading или isLoad
+    ingredientsState?.loading ?? ingredientsState?.isLoad
+  );
 
   return (
     <>
