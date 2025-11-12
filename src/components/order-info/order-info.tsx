@@ -14,9 +14,7 @@ export const OrderInfo: FC = () => {
   const appDispatch = useDispatch();
   const { number: orderNumberParam } = useParams<{ number?: string }>();
 
-  // заказ, полученный из стора
   const fetchedOrder = useSelector(selectOrderData) as any | null;
-  // все ингредиенты из стора
   const allIngredients: TIngredient[] = useSelector(selectIngredients) ?? [];
 
   useEffect(() => {
@@ -29,10 +27,8 @@ export const OrderInfo: FC = () => {
     if (!Array.isArray(fetchedOrder.ingredients) || allIngredients.length === 0)
       return null;
 
-    // создаём дату из поля createdAt
     const createdDate = new Date(fetchedOrder.createdAt);
 
-    // собираем объект ингредиентов с подсчётом каждого id
     type TIngredientsWithCount = Record<
       string,
       TIngredient & { count: number }
@@ -52,7 +48,6 @@ export const OrderInfo: FC = () => {
       return acc;
     }, {});
 
-    // считаем общую сумму
     const total = Object.values(ingredientsInfo).reduce(
       (sum: number, item) => sum + (item.price ?? 0) * (item.count ?? 0),
       0

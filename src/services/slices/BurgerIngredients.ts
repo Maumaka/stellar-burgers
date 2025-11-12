@@ -14,10 +14,9 @@ const pantrySeed: IngredientsStoreState = {
   error: null
 };
 
-/* экспортируем начальное состояние под старым именем для совместимости */
 export const initialState: IngredientsStoreState = pantrySeed;
 
-/* thunk для загрузки ингредиентов */
+//thunk для загрузки ингредиентов
 export const fetchIngredientsThunk = createAsyncThunk(
   'ingredients/fetch',
   getIngredientsApi
@@ -49,11 +48,9 @@ export const ingredientsSlice = createSlice({
 export default ingredientsSlice.reducer;
 
 type RootState = any;
-/* внутренний селектор, возвращает срез стора */
 const pickIngredientsSlice = (state: RootState): IngredientsStoreState =>
   state?.ingredients ?? (state as any);
 
-/* экспортируем селекторы под прежними публичными именами */
 const selectIngredientsItems = (state: RootState) =>
   pickIngredientsSlice(state).items;
 

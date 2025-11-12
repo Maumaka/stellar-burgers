@@ -38,17 +38,14 @@ export const constructorSlice = createSlice({
   name: 'constructorbg',
   initialState: stateSeed,
   reducers: {
-    // добавление ингредиента, для не-bun генерируем внутренний id
     addIngredient: (
       state,
       action: PayloadAction<TIngredient | TConstructorIngredient>
     ) => {
       const payload = action.payload as any;
       if (payload?.type === 'bun') {
-        // сохраняем булку
         state.constructor.bun = payload as TConstructorIngredient;
       } else {
-        // создаём элемент конструктора с id
         const newEntry: TConstructorIngredient = {
           ...(payload as TIngredient),
           id: (payload as any).id || nanoid()
@@ -57,37 +54,30 @@ export const constructorSlice = createSlice({
       }
     },
 
-    // удаление по внутреннему id
     removeIngredient: (state, action: PayloadAction<string>) => {
       state.constructor.ingredients = state.constructor.ingredients.filter(
         (ing) => ing.id !== action.payload
       );
     },
 
-    // переставить вниз (защита границ)
     moveDownIngredient: (state, action: PayloadAction<number>) => {
       const index = action.payload;
       const list = state.constructor.ingredients;
       if (index < 0 || index >= list.length - 1) return;
-      // простая инлайновая перестановка без дополнительной функции
       [list[index], list[index + 1]] = [list[index + 1], list[index]];
     },
 
-    // переставить вверх (защита границ)
     moveUpIngredient: (state, action: PayloadAction<number>) => {
       const index = action.payload;
       const list = state.constructor.ingredients;
       if (index <= 0 || index >= list.length) return;
-      // простая инлайновая перестановка без дополнительной функции
       [list[index], list[index - 1]] = [list[index - 1], list[index]];
     },
 
-    // флаг запроса заказа
     setOrderRequest: (state, action: PayloadAction<boolean>) => {
       state.orderRequest = action.payload;
     },
 
-    // очистка данных модалки заказа
     clearOrderModalData: (state) => {
       state.orderModalData = null;
     }
@@ -115,13 +105,10 @@ export const constructorSlice = createSlice({
   }
 });
 
-/* экспорт начального состояния (как раньше) */
 export { stateSeed as constructorInitialState };
 
-/* дефолтный редьюсер */
 export default constructorSlice.reducer;
 
-/* экшены (оставлены оригинальные имена) */
 export const {
   addIngredient,
   removeIngredient,
@@ -131,7 +118,6 @@ export const {
   clearOrderModalData
 } = constructorSlice.actions;
 
-/* селекторы — возвращают часть state (корректируйте key в store если нужно) */
 type RootState = any;
 const getConstructorSlice = (state: RootState): ConstructorStoreState =>
   state?.constructorbg ?? (state as any);
@@ -145,7 +131,6 @@ const orderRequestSelector = (state: RootState) =>
 const orderModalDataSelector = (state: RootState) =>
   getConstructorSlice(state).orderModalData;
 
-/* экспорт селекторов (оригинальные имена сохранены) */
 export {
   constructorStateSelector,
   constructorDataSelector,

@@ -37,18 +37,15 @@ const App = () => {
   const feedOrderNumber = useMatch('/feed/:number')?.params.number;
   const displayedOrderNumber = profOrderNumber || feedOrderNumber;
 
-  // состояние локации для модальных окон
   const locState = currentLocation.state as
     | { background?: Location }
     | undefined;
   const modalBackground = locState?.background;
 
-  // закрыть модальное окно — возвращаемся на предыдущую страницу
   const handleCloseModal = () => {
     navigator(-1);
   };
 
-  // при монтировании загружаем пользователя и ингредиенты
   useEffect(() => {
     appDispatch(getUserThunk());
     appDispatch(getIngredientsThunk());

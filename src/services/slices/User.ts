@@ -73,10 +73,10 @@ export const getUserThunk = createAsyncThunk(
 
 export interface UserStoreState {
   isLoad: boolean;
-  user: TUser | null; // null — неавторизован
+  user: TUser | null;
   isAuth: boolean;
-  loginUserError: null | string; // ошибка аутентификации
-  isAuthChecked: boolean; // флаг завершённой проверки авторизации
+  loginUserError: null | string;
+  isAuthChecked: boolean;
 }
 
 const storeSeed: UserStoreState = {
