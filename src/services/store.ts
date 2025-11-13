@@ -1,23 +1,34 @@
-import { configureStore } from '@reduxjs/toolkit';
-
 import {
   TypedUseSelectorHook,
-  useDispatch as dispatchHook,
-  useSelector as selectorHook
+  useDispatch as rawUseDispatch,
+  useSelector as rawUseSelector
 } from 'react-redux';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import {
+  constructorSlice,
+  feedSlice,
+  ingredientsSlice,
+  orderSlice,
+  userSlice
+} from '@slices';
+const combinedReducer = combineReducers({
+  user: userSlice.reducer,
+  order: orderSlice.reducer,
+  ingredients: ingredientsSlice.reducer,
+  constructorbg: constructorSlice.reducer,
+  feed: feedSlice.reducer
+});
 
-const rootReducer = () => {}; // Заменить на импорт настоящего редьюсера
-
-const store = configureStore({
-  reducer: rootReducer,
+const appStore = configureStore({
+  reducer: combinedReducer,
   devTools: process.env.NODE_ENV !== 'production'
 });
 
-export type RootState = ReturnType<typeof rootReducer>;
+export type RootState = ReturnType<typeof combinedReducer>;
+export type AppDispatch = typeof appStore.dispatch;
 
-export type AppDispatch = typeof store.dispatch;
+export const useDispatch: () => AppDispatch = () =>
+  rawUseDispatch<AppDispatch>();
+export const useSelector: TypedUseSelectorHook<RootState> = rawUseSelector;
 
-export const useDispatch: () => AppDispatch = () => dispatchHook();
-export const useSelector: TypedUseSelectorHook<RootState> = selectorHook;
-
-export default store;
+export default appStore;

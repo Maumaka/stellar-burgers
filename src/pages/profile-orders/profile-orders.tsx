@@ -1,10 +1,25 @@
+import {
+  getOrdersThunk,
+  ordersDataSelector as selectOrdersData
+} from '@slices';
 import { ProfileOrdersUI } from '@ui-pages';
 import { TOrder } from '@utils-types';
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
+import { useDispatch, useSelector } from '../../services/store';
 
 export const ProfileOrders: FC = () => {
-  /** TODO: взять переменную из стора */
-  const orders: TOrder[] = [];
+  // диспатч для вызова thunk-ов
+  const appDispatch = useDispatch();
+  const userOrders: TOrder[] = useSelector(selectOrdersData);
 
-  return <ProfileOrdersUI orders={orders} />;
+  // функция для загрузки заказов
+  const fetchOrders = () => {
+    appDispatch(getOrdersThunk());
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, [appDispatch]);
+
+  return <ProfileOrdersUI orders={userOrders} />;
 };
