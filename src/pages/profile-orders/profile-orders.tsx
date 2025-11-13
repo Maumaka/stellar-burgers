@@ -10,8 +10,6 @@ import { useDispatch, useSelector } from '../../services/store';
 export const ProfileOrders: FC = () => {
   // диспатч для вызова thunk-ов
   const appDispatch = useDispatch();
-
-  // заказы пользователя из стора
   const userOrders: TOrder[] = useSelector(selectOrdersData);
 
   // функция для загрузки заказов
@@ -19,7 +17,6 @@ export const ProfileOrders: FC = () => {
     appDispatch(getOrdersThunk());
   };
 
-  // при монтировании компонента загружаем заказы
   useEffect(() => {
     fetchOrders();
   }, [appDispatch]);

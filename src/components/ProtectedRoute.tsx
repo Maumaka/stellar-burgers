@@ -11,28 +11,26 @@ type ProtectedRouteProps = {
   children: React.ReactElement;
 };
 
+type FromLocation = { pathname: string };
+
+type LocationState = { from?: FromLocation };
+
 export const ProtectedRoute = ({ onlyAuth, children }: ProtectedRouteProps) => {
-  // селектор, показывающий, что проверка авторизации завершена
   const isAuthReady = useSelector(selectIsAuthChecked);
-  // данные текущего пользователя из стора (если есть)
   const currentUser = useSelector(selectUserData);
   const currentLocation = useLocation();
 
-  // пока не известно состояние авторизации — показываем прелоадер
   if (!isAuthReady) {
     return <Preloader />;
   }
 
-  // маршрут, доступный только авторизованным пользователям (protected route)
   if (!onlyAuth && !currentUser) {
     return <Navigate replace to='/login' state={{ from: currentLocation }} />;
   }
 
-  // маршрут, доступный только неавторизованным пользователям (guest route)
   if (onlyAuth && currentUser) {
-    const fromLocation = (currentLocation.state as any)?.from || {
-      pathname: '/'
-    };
+    const fromLocation = (currentLocation.state as LocationState | undefined)
+      ?.from ?? { pathname: '/' };
     return <Navigate replace to={fromLocation} />;
   }
 

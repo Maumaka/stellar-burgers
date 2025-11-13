@@ -2,9 +2,15 @@ import { getFeedsApi } from '@api';
 import { TOrder } from '@utils-types';
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
+interface FeedApiResponse {
+  orders: TOrder[];
+  total: number;
+  totalToday: number;
+}
+
 export const fetchFeedsThunk = createAsyncThunk(
   'feed/get-feeds',
-  async () => await getFeedsApi()
+  async (): Promise<FeedApiResponse> => await getFeedsApi()
 );
 export const getFeedsThunk = fetchFeedsThunk;
 
@@ -16,7 +22,7 @@ export interface FeedStoreState {
   error: string | null;
 }
 
-const feedSeed: FeedStoreState = {
+const initialState: FeedStoreState = {
   loading: false,
   orders: [],
   total: 0,
@@ -26,13 +32,13 @@ const feedSeed: FeedStoreState = {
 
 export const feedSlice = createSlice({
   name: 'feed',
-  initialState: feedSeed,
+  initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchFeedsThunk.pending, (state) => {
-        state.loading = true; // загрузка
-        state.error = null; // сброс ошибки
+        state.loading = true;
+        state.error = null;
       })
       .addCase(fetchFeedsThunk.rejected, (state, action) => {
         state.loading = false;
@@ -40,7 +46,7 @@ export const feedSlice = createSlice({
       })
       .addCase(
         fetchFeedsThunk.fulfilled,
-        (state, action: PayloadAction<any>) => {
+        (state, action: PayloadAction<FeedApiResponse>) => {
           state.loading = false;
           state.orders = action.payload.orders;
           state.total = action.payload.total;
@@ -51,8 +57,12 @@ export const feedSlice = createSlice({
   }
 });
 
-type RootState = any;
-const pickFeedSlice = (state: RootState) => state?.feed ?? (state as any);
+interface RootState {
+  feed?: FeedStoreState;
+}
+
+const pickFeedSlice = (state: RootState): FeedStoreState =>
+  state?.feed ?? initialState;
 
 const selectFeedData = (state: RootState) => pickFeedSlice(state).orders;
 const selectFeedTotal = (state: RootState) => pickFeedSlice(state).total;

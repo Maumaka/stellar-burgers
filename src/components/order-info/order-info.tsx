@@ -9,12 +9,27 @@ import {
   ingredientsDataSelector as selectIngredients,
   orderDataSelector as selectOrderData
 } from '@slices';
+interface IOrder {
+  _id: string;
+  ingredients: string[];
+  status: 'created' | 'pending' | 'done';
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  number: number;
+}
+
+interface IPreparedOrder extends IOrder {
+  ingredientsInfo: Record<string, TIngredient & { count: number }>;
+  date: Date;
+  total: number;
+}
 
 export const OrderInfo: FC = () => {
   const appDispatch = useDispatch();
   const { number: orderNumberParam } = useParams<{ number?: string }>();
 
-  const fetchedOrder = useSelector(selectOrderData) as any | null;
+  const fetchedOrder = useSelector(selectOrderData) as IOrder | null;
   const allIngredients: TIngredient[] = useSelector(selectIngredients) ?? [];
 
   useEffect(() => {
@@ -34,19 +49,18 @@ export const OrderInfo: FC = () => {
       TIngredient & { count: number }
     >;
 
-    const ingredientsInfo = (
-      fetchedOrder.ingredients as string[]
-    ).reduce<TIngredientsWithCount>((acc, id) => {
-      if (!acc[id]) {
-        const found = allIngredients.find((ing) => ing._id === id);
-        if (found) {
-          acc[id] = { ...found, count: 1 };
+    const ingredientsInfo =
+      fetchedOrder.ingredients.reduce<TIngredientsWithCount>((acc, id) => {
+        if (!acc[id]) {
+          const found = allIngredients.find((ing) => ing._id === id);
+          if (found) {
+            acc[id] = { ...found, count: 1 };
+          }
+        } else {
+          acc[id].count += 1;
         }
-      } else {
-        acc[id].count += 1;
-      }
-      return acc;
-    }, {});
+        return acc;
+      }, {});
 
     const total = Object.values(ingredientsInfo).reduce(
       (sum: number, item) => sum + (item.price ?? 0) * (item.count ?? 0),
@@ -58,7 +72,7 @@ export const OrderInfo: FC = () => {
       ingredientsInfo,
       date: createdDate,
       total
-    };
+    } as IPreparedOrder;
   }, [fetchedOrder, allIngredients]);
 
   if (!preparedOrder) {

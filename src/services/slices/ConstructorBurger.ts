@@ -23,7 +23,7 @@ export interface ConstructorStoreState {
   constructorError: string | null;
 }
 
-const stateSeed: ConstructorStoreState = {
+const initialState: ConstructorStoreState = {
   isLoad: false,
   constructor: {
     bun: null,
@@ -36,22 +36,37 @@ const stateSeed: ConstructorStoreState = {
 
 export const constructorSlice = createSlice({
   name: 'constructorbg',
-  initialState: stateSeed,
+  initialState,
   reducers: {
-    addIngredient: (
-      state,
-      action: PayloadAction<TIngredient | TConstructorIngredient>
-    ) => {
-      const payload = action.payload as any;
-      if (payload?.type === 'bun') {
-        state.constructor.bun = payload as TConstructorIngredient;
-      } else {
-        const newEntry: TConstructorIngredient = {
-          ...(payload as TIngredient),
-          id: (payload as any).id || nanoid()
-        } as TConstructorIngredient;
-        state.constructor.ingredients.push(newEntry);
-      }
+    addIngredient: {
+      reducer: (
+        state,
+        action: PayloadAction<{
+          ingredient: TIngredient | TConstructorIngredient;
+          id: string;
+        }>
+      ) => {
+        const { ingredient, id } = action.payload;
+        if (ingredient.type === 'bun') {
+          const bunIngredient: TConstructorIngredient = {
+            ...ingredient,
+            id
+          };
+          state.constructor.bun = bunIngredient;
+        } else {
+          const newEntry: TConstructorIngredient = {
+            ...ingredient,
+            id
+          };
+          state.constructor.ingredients.push(newEntry);
+        }
+      },
+      prepare: (ingredient: TIngredient | TConstructorIngredient) => ({
+        payload: {
+          ingredient,
+          id: nanoid()
+        }
+      })
     },
 
     removeIngredient: (state, action: PayloadAction<string>) => {
@@ -99,13 +114,11 @@ export const constructorSlice = createSlice({
           ingredients: []
         };
         state.orderRequest = false;
-        state.orderModalData = (action.payload as any)?.order ?? null;
+        state.orderModalData = action.payload.order ?? null;
         state.constructorError = null;
       });
   }
 });
-
-export { stateSeed as constructorInitialState };
 
 export default constructorSlice.reducer;
 
@@ -118,9 +131,12 @@ export const {
   clearOrderModalData
 } = constructorSlice.actions;
 
-type RootState = any;
+interface RootState {
+  constructorbg?: ConstructorStoreState;
+}
+
 const getConstructorSlice = (state: RootState): ConstructorStoreState =>
-  state?.constructorbg ?? (state as any);
+  state?.constructorbg ?? initialState;
 
 const constructorStateSelector = (state: RootState) =>
   getConstructorSlice(state);

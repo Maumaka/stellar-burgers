@@ -204,8 +204,11 @@ export const userSlice = createSlice({
 export default userSlice.reducer;
 export const { clearUserError } = userSlice.actions;
 
-type RootState = any;
-const pickUserSlice = (state: RootState) => state?.user ?? (state as any);
+interface RootState {
+  user?: UserStoreState;
+}
+
+const pickUserSlice = (state: RootState) => state?.user ?? storeSeed;
 
 const userStateSelector = (state: RootState) => pickUserSlice(state);
 const userDataSelector = (state: RootState) => pickUserSlice(state).user;

@@ -8,21 +8,19 @@ import {
 } from '@slices';
 
 export const Register: FC = () => {
-  // локальные состояния для полей формы
   const [nameValue, setNameValue] = useState('');
   const [emailValue, setEmailValue] = useState('');
   const [passwordValue, setPasswordValue] = useState('');
 
-  // диспатч и ошибка пользователя из стора
   const appDispatch = useDispatch();
   const rawError = useSelector(selectUserError);
 
-  // нормализуем ошибку в строку (безопасно) для передачи в ui
   const errorText: string | undefined = (() => {
     if (!rawError) return undefined;
     if (typeof rawError === 'string') return rawError;
-    if (typeof (rawError as any)?.message === 'string')
-      return (rawError as any).message;
+    if (rawError && typeof rawError === 'object' && 'message' in rawError) {
+      return (rawError as { message: string }).message;
+    }
     try {
       return JSON.stringify(rawError);
     } catch {
@@ -30,7 +28,6 @@ export const Register: FC = () => {
     }
   })();
 
-  // при монтировании очищаем возможные старые ошибки, при размонтировании тоже очищаем
   useEffect(() => {
     appDispatch(clearUserError());
     return () => {

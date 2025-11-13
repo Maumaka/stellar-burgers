@@ -8,15 +8,12 @@ export interface IngredientsStoreState {
   error: string | null;
 }
 
-const pantrySeed: IngredientsStoreState = {
+const initialState: IngredientsStoreState = {
   loading: false,
   items: [],
   error: null
 };
 
-export const initialState: IngredientsStoreState = pantrySeed;
-
-//thunk для загрузки ингредиентов
 export const fetchIngredientsThunk = createAsyncThunk(
   'ingredients/fetch',
   getIngredientsApi
@@ -25,7 +22,7 @@ export const getIngredientsThunk = fetchIngredientsThunk;
 
 export const ingredientsSlice = createSlice({
   name: 'ingredients',
-  initialState: pantrySeed,
+  initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
@@ -47,9 +44,12 @@ export const ingredientsSlice = createSlice({
 
 export default ingredientsSlice.reducer;
 
-type RootState = any;
+interface RootState {
+  ingredients?: IngredientsStoreState;
+}
+
 const pickIngredientsSlice = (state: RootState): IngredientsStoreState =>
-  state?.ingredients ?? (state as any);
+  state?.ingredients ?? initialState;
 
 const selectIngredientsItems = (state: RootState) =>
   pickIngredientsSlice(state).items;

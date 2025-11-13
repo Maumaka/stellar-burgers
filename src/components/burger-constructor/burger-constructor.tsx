@@ -64,5 +64,3 @@ export const BurgerConstructor: FC = () => {
     />
   );
 };
-
-//

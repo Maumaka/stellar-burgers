@@ -25,14 +25,11 @@ import {
 } from '@pages';
 
 const App = () => {
-  // хуки для управления навигацией и получения положения
   const navigator = useNavigate();
   const currentLocation = useLocation();
 
-  // диспатч для вызова thunk/экшенов
   const appDispatch = useDispatch();
 
-  // извлекаем номер заказа из url (профиль или лента)
   const profOrderNumber = useMatch('/profile/orders/:number')?.params.number;
   const feedOrderNumber = useMatch('/feed/:number')?.params.number;
   const displayedOrderNumber = profOrderNumber || feedOrderNumber;
@@ -60,7 +57,7 @@ const App = () => {
         <Route
           path='/login'
           element={
-            <ProtectedRoute onlyAuth>
+            <ProtectedRoute onlyAuth={false}>
               <Login />
             </ProtectedRoute>
           }
@@ -68,7 +65,7 @@ const App = () => {
         <Route
           path='/register'
           element={
-            <ProtectedRoute onlyAuth>
+            <ProtectedRoute onlyAuth={false}>
               <Register />
             </ProtectedRoute>
           }
@@ -76,7 +73,7 @@ const App = () => {
         <Route
           path='/forgot-password'
           element={
-            <ProtectedRoute onlyAuth>
+            <ProtectedRoute onlyAuth={false}>
               <ForgotPassword />
             </ProtectedRoute>
           }
@@ -84,7 +81,7 @@ const App = () => {
         <Route
           path='/reset-password'
           element={
-            <ProtectedRoute>
+            <ProtectedRoute onlyAuth={false}>
               <ResetPassword />
             </ProtectedRoute>
           }
@@ -92,7 +89,7 @@ const App = () => {
         <Route
           path='/profile'
           element={
-            <ProtectedRoute>
+            <ProtectedRoute onlyAuth>
               <Profile />
             </ProtectedRoute>
           }
@@ -100,7 +97,7 @@ const App = () => {
         <Route
           path='/profile/orders'
           element={
-            <ProtectedRoute>
+            <ProtectedRoute onlyAuth>
               <ProfileOrders />
             </ProtectedRoute>
           }
@@ -126,7 +123,7 @@ const App = () => {
           path='/profile/orders/:number'
           element={
             <div className={styles.app}>
-              <ProtectedRoute>
+              <ProtectedRoute onlyAuth>
                 <OrderInfo />
               </ProtectedRoute>
             </div>
@@ -162,7 +159,7 @@ const App = () => {
                 title={`#${displayedOrderNumber && displayedOrderNumber.padStart(6, '0')}`}
                 onClose={handleCloseModal}
               >
-                <ProtectedRoute>
+                <ProtectedRoute onlyAuth>
                   <OrderInfo />
                 </ProtectedRoute>
               </Modal>

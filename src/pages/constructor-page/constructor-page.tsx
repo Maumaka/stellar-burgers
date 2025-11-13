@@ -7,11 +7,16 @@ import { BurgerIngredients, BurgerConstructor } from '../../components';
 import { Preloader } from '../../components/ui';
 import { ingredientsStateSelector } from '@slices';
 
+interface IIngredientsState {
+  loading?: boolean;
+  isLoad?: boolean;
+}
+
 export const ConstructorPage: FC = () => {
-  // получаем состояние ингредиентов (поддерживаем старую и новую форму)
-  const ingredientsState = useSelector(ingredientsStateSelector) as any;
+  const ingredientsState = useSelector(
+    ingredientsStateSelector
+  ) as IIngredientsState | null;
   const isIngredientsLoading = Boolean(
-    // совместимость: если в слайсе поле называется loading или isLoad
     ingredientsState?.loading ?? ingredientsState?.isLoad
   );
 

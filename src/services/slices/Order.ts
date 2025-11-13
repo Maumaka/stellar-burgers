@@ -55,15 +55,19 @@ export const orderSlice = createSlice({
       .addCase(getOrderThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        state.order = (action.payload as any)?.orders?.[0] ?? null;
+        const payload = action.payload as { orders?: TOrder[] };
+        state.order = payload?.orders?.[0] ?? null;
       });
   }
 });
 
 export default orderSlice.reducer;
 
-type RootState = any;
-const pickOrderSlice = (state: RootState) => state?.order ?? (state as any);
+interface RootState {
+  order?: OrdersStoreState;
+}
+
+const pickOrderSlice = (state: RootState) => state?.order ?? storeSeed;
 const selectOrders = (state: RootState) => pickOrderSlice(state).orders;
 const selectOrder = (state: RootState) => pickOrderSlice(state).order;
 const selectOrderLoading = (state: RootState) => pickOrderSlice(state).loading;
