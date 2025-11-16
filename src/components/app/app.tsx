@@ -57,7 +57,7 @@ const App = () => {
         <Route
           path='/login'
           element={
-            <ProtectedRoute onlyAuth={false}>
+            <ProtectedRoute onlyAuth>
               <Login />
             </ProtectedRoute>
           }
@@ -65,7 +65,7 @@ const App = () => {
         <Route
           path='/register'
           element={
-            <ProtectedRoute onlyAuth={false}>
+            <ProtectedRoute onlyAuth>
               <Register />
             </ProtectedRoute>
           }
@@ -73,7 +73,7 @@ const App = () => {
         <Route
           path='/forgot-password'
           element={
-            <ProtectedRoute onlyAuth={false}>
+            <ProtectedRoute onlyAuth>
               <ForgotPassword />
             </ProtectedRoute>
           }
@@ -81,7 +81,7 @@ const App = () => {
         <Route
           path='/reset-password'
           element={
-            <ProtectedRoute onlyAuth={false}>
+            <ProtectedRoute onlyAuth>
               <ResetPassword />
             </ProtectedRoute>
           }
@@ -89,7 +89,7 @@ const App = () => {
         <Route
           path='/profile'
           element={
-            <ProtectedRoute onlyAuth>
+            <ProtectedRoute>
               <Profile />
             </ProtectedRoute>
           }
@@ -97,7 +97,7 @@ const App = () => {
         <Route
           path='/profile/orders'
           element={
-            <ProtectedRoute onlyAuth>
+            <ProtectedRoute>
               <ProfileOrders />
             </ProtectedRoute>
           }
@@ -123,7 +123,7 @@ const App = () => {
           path='/profile/orders/:number'
           element={
             <div className={styles.app}>
-              <ProtectedRoute onlyAuth>
+              <ProtectedRoute>
                 <OrderInfo />
               </ProtectedRoute>
             </div>
@@ -159,7 +159,7 @@ const App = () => {
                 title={`#${displayedOrderNumber && displayedOrderNumber.padStart(6, '0')}`}
                 onClose={handleCloseModal}
               >
-                <ProtectedRoute onlyAuth>
+                <ProtectedRoute>
                   <OrderInfo />
                 </ProtectedRoute>
               </Modal>
