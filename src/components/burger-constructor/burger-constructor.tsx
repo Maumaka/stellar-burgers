@@ -1,43 +1,64 @@
 import { FC, useMemo } from 'react';
 import { TConstructorIngredient } from '@utils-types';
 import { BurgerConstructorUI } from '@ui';
+import { useNavigate } from 'react-router-dom';
+import store, { useDispatch, useSelector } from '../../services/store';
+import {
+  clearOrderModalData,
+  constructorDataSelector as selectConstructorData,
+  createBurgerThunk,
+  isAuthSelector as selectIsAuth,
+  orderModalDataSelector as selectOrderModalData,
+  orderRequestSelector as selectOrderRequest,
+  setOrderRequest
+} from '@slices';
 
 export const BurgerConstructor: FC = () => {
-  /** TODO: взять переменные constructorItems, orderRequest и orderModalData из стора */
-  const constructorItems = {
-    bun: {
-      price: 0
-    },
-    ingredients: []
-  };
-
-  const orderRequest = false;
-
-  const orderModalData = null;
+  const routerNavigate = useNavigate();
+  const appDispatch = useDispatch();
+  const userIsAuthenticated = useSelector(selectIsAuth);
+  const constructorState = useSelector(selectConstructorData);
+  const isOrderPending = useSelector(selectOrderRequest);
+  const orderModalState = useSelector(selectOrderModalData);
 
   const onOrderClick = () => {
-    if (!constructorItems.bun || orderRequest) return;
+    if (!userIsAuthenticated) {
+      routerNavigate('/login');
+      return;
+    }
+
+    if (!constructorState.bun || isOrderPending) return;
+
+    const order = [
+      constructorState.bun?._id,
+      ...constructorState.ingredients.map((ingredient) => ingredient._id),
+      constructorState.bun?._id
+    ].filter(Boolean);
+
+    appDispatch(createBurgerThunk(order));
   };
-  const closeOrderModal = () => {};
+
+  const closeOrderModal = () => {
+    appDispatch(setOrderRequest(false));
+    appDispatch(clearOrderModalData());
+  };
 
   const price = useMemo(
     () =>
-      (constructorItems.bun ? constructorItems.bun.price * 2 : 0) +
-      constructorItems.ingredients.reduce(
-        (s: number, v: TConstructorIngredient) => s + v.price,
+      (constructorState.bun ? constructorState.bun.price * 2 : 0) +
+      constructorState.ingredients.reduce(
+        (sum: number, item: TConstructorIngredient) => sum + item.price,
         0
       ),
-    [constructorItems]
+    [constructorState]
   );
-
-  return null;
 
   return (
     <BurgerConstructorUI
       price={price}
-      orderRequest={orderRequest}
-      constructorItems={constructorItems}
-      orderModalData={orderModalData}
+      orderRequest={isOrderPending}
+      constructorItems={constructorState}
+      orderModalData={orderModalState}
       onOrderClick={onOrderClick}
       closeOrderModal={closeOrderModal}
     />

@@ -1,15 +1,24 @@
+import { FC } from 'react';
 import { useSelector } from '../../services/store';
 
 import styles from './constructor-page.module.css';
 
-import { BurgerIngredients } from '../../components';
-import { BurgerConstructor } from '../../components';
+import { BurgerIngredients, BurgerConstructor } from '../../components';
 import { Preloader } from '../../components/ui';
-import { FC } from 'react';
+import { ingredientsStateSelector } from '@slices';
+
+interface IIngredientsState {
+  loading?: boolean;
+  isLoad?: boolean;
+}
 
 export const ConstructorPage: FC = () => {
-  /** TODO: взять переменную из стора */
-  const isIngredientsLoading = false;
+  const ingredientsState = useSelector(
+    ingredientsStateSelector
+  ) as IIngredientsState | null;
+  const isIngredientsLoading = Boolean(
+    ingredientsState?.loading ?? ingredientsState?.isLoad
+  );
 
   return (
     <>
